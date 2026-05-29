@@ -1,6 +1,5 @@
 let allSmartphones = [];
 
-// 用語解説辞書
 const glossaries = {
   'RAM': 'RAM（Random Access Memory）は、スマホがアプリを動かすための「作業机」です。容量が大きいほど、多くのアプリを同時に開いても動作が重くなりにくくなります。',
   'CPU': 'CPUはスマホの「頭脳」です。計算処理の速度を決定し、アプリの起動やゲームの快適さに大きく関わります。',
@@ -96,7 +95,6 @@ function showGlossary(label, phone) {
   const tr = document.createElement('tr');
   const td = document.createElement('td');
   td.colSpan = 2; 
-  // 🌟 解説欄も少し広く調整
   td.className = "p-6 md:p-10 bg-indigo-50/30"; 
 
   td.innerHTML = `
@@ -119,8 +117,9 @@ function showGlossary(label, phone) {
 
 function showDetail(phone) {
   const dropdownMenu = document.getElementById('dropdown-menu');
-  dropdownMenu.classList.add('max-h-0', 'opacity-0');
-  dropdownMenu.classList.remove('max-h-[500px]', 'opacity-100');
+  // 🌟 ここにも pointer-events-none を追加
+  dropdownMenu.classList.add('max-h-0', 'opacity-0', 'pointer-events-none');
+  dropdownMenu.classList.remove('max-h-[600px]', 'opacity-100');
   
   document.getElementById('welcome-message').classList.add('hidden');
   
@@ -180,7 +179,6 @@ function showDetail(phone) {
     tr.className = "group transition-colors duration-200 hover:bg-indigo-50/40";
     
     const labelCell = document.createElement('th');
-    // 🌟 paddingを py-4 から py-5 (PCは py-6) に広げて高さを確保
     labelCell.className = "px-5 py-5 md:py-6 bg-slate-50/50 font-medium text-slate-500 w-1/3 text-sm";
     
     if (glossaries[spec.label]) {
@@ -192,7 +190,6 @@ function showDetail(phone) {
     }
 
     const valueCell = document.createElement('td');
-    // 🌟 こちらも py-5 (PCは py-6) に変更
     valueCell.className = "px-5 py-5 md:py-6 text-slate-800 font-medium text-sm";
     valueCell.textContent = spec.value;
 
@@ -204,20 +201,26 @@ function showDetail(phone) {
 
 const searchBtn = document.getElementById('search-btn');
 const dropdownMenu = document.getElementById('dropdown-menu');
+
 searchBtn.addEventListener('click', (event) => {
   event.stopPropagation();
   if (dropdownMenu.classList.contains('max-h-0')) {
-    dropdownMenu.classList.remove('max-h-0', 'opacity-0');
+    // 🌟 表示する時は貫通をオフ（クリック可能にする）
+    dropdownMenu.classList.remove('max-h-0', 'opacity-0', 'pointer-events-none');
     dropdownMenu.classList.add('max-h-[600px]', 'opacity-100'); 
   } else {
-    dropdownMenu.classList.add('max-h-0', 'opacity-0');
+    // 🌟 隠す時は貫通をオン
+    dropdownMenu.classList.add('max-h-0', 'opacity-0', 'pointer-events-none');
     dropdownMenu.classList.remove('max-h-[600px]', 'opacity-100');
   }
 });
+
 dropdownMenu.addEventListener('click', (event) => event.stopPropagation());
+
 window.addEventListener('click', () => {
   if (!dropdownMenu.classList.contains('max-h-0')) {
-    dropdownMenu.classList.add('max-h-0', 'opacity-0');
+    // 🌟 ここにも pointer-events-none を追加
+    dropdownMenu.classList.add('max-h-0', 'opacity-0', 'pointer-events-none');
     dropdownMenu.classList.remove('max-h-[600px]', 'opacity-100');
   }
 });
