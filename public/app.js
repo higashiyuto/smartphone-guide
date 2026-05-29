@@ -108,57 +108,20 @@ function showGlossary(label, phone) {
   const backBtn = document.createElement('button');
   backBtn.className = "flex items-center gap-2 bg-white border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 text-slate-700 font-medium px-5 py-2.5 rounded-xl text-sm transition-all shadow-sm active:scale-95";
   backBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> スペック表に戻る`;
-  backBtn.onclick = () => showDetail(phone); 
+  
+  // 🌟 修正ポイント1: showDetail ではなく、新しい renderSpecTable を呼ぶ！
+  backBtn.onclick = () => renderSpecTable(phone); 
 
   td.appendChild(backBtn);
   tr.appendChild(td);
   tbody.appendChild(tr);
 }
 
-function showDetail(phone) {
-  const dropdownMenu = document.getElementById('dropdown-menu');
-  dropdownMenu.classList.add('max-h-0', 'opacity-0', 'pointer-events-none');
-  dropdownMenu.classList.remove('max-h-[600px]', 'opacity-100');
-  
-  document.getElementById('welcome-message').classList.add('hidden');
-  
-  const detailBox = document.getElementById('detail-box');
-  detailBox.classList.remove('hidden');
-  detailBox.style.animation = 'none';
-  detailBox.offsetHeight;
-  detailBox.style.animation = null;
-
-  document.getElementById('selected-name').textContent = phone.name;
-
-  const imageEl = document.getElementById('phone-image');
-  const colorNameEl = document.getElementById('current-color-name');
-  
-  if (phone.variants && phone.variants.length > 0) {
-    imageEl.src = phone.variants[0].imageUrl;
-    colorNameEl.textContent = phone.variants[0].colorName;
-  }
-
-  const colorContainer = document.getElementById('color-options');
-  colorContainer.innerHTML = ''; 
-  if (phone.variants) {
-    phone.variants.forEach(variant => {
-      const btn = document.createElement('button');
-      btn.className = 'w-9 h-9 rounded-full border-2 border-white ring-1 ring-slate-200 shadow-md hover:scale-110 transition-transform cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-400';
-      btn.style.backgroundColor = variant.colorHex; 
-      
-      btn.addEventListener('click', () => {
-        // 🌟 モッサリの原因だった setTimeout と opacity アニメーションを完全削除
-        // 🌟 画像と色名が「タップした瞬間に」サクサク切り替わります！
-        imageEl.src = variant.imageUrl;
-        colorNameEl.textContent = variant.colorName; 
-      });
-      
-      colorContainer.appendChild(btn);
-    });
-  }
-
+// 🌟 新しく作成した関数：スペック表だけを描画・再描画する処理
+function renderSpecTable(phone) {
   const tbody = document.getElementById('selected-specs');
   tbody.innerHTML = '';
+  
   const specData = [
     { label: '発売日', value: phone.releaseDate ? new Date(phone.releaseDate).toLocaleDateString() : '不明' },
     { label: '容量 (ROM)', value: phone.specs?.rom || '不明' },
@@ -196,6 +159,51 @@ function showDetail(phone) {
     tr.appendChild(valueCell);
     tbody.appendChild(tr);
   });
+}
+
+function showDetail(phone) {
+  const dropdownMenu = document.getElementById('dropdown-menu');
+  dropdownMenu.classList.add('max-h-0', 'opacity-0', 'pointer-events-none');
+  dropdownMenu.classList.remove('max-h-[600px]', 'opacity-100');
+  
+  document.getElementById('welcome-message').classList.add('hidden');
+  
+  const detailBox = document.getElementById('detail-box');
+  detailBox.classList.remove('hidden');
+  detailBox.style.animation = 'none';
+  detailBox.offsetHeight;
+  detailBox.style.animation = null;
+
+  document.getElementById('selected-name').textContent = phone.name;
+
+  const imageEl = document.getElementById('phone-image');
+  const colorNameEl = document.getElementById('current-color-name');
+  
+  // 色や画像の初期化はここでのみ行う
+  if (phone.variants && phone.variants.length > 0) {
+    imageEl.src = phone.variants[0].imageUrl;
+    colorNameEl.textContent = phone.variants[0].colorName;
+  }
+
+  const colorContainer = document.getElementById('color-options');
+  colorContainer.innerHTML = ''; 
+  if (phone.variants) {
+    phone.variants.forEach(variant => {
+      const btn = document.createElement('button');
+      btn.className = 'w-9 h-9 rounded-full border-2 border-white ring-1 ring-slate-200 shadow-md hover:scale-110 transition-transform cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-400';
+      btn.style.backgroundColor = variant.colorHex; 
+      
+      btn.addEventListener('click', () => {
+        imageEl.src = variant.imageUrl;
+        colorNameEl.textContent = variant.colorName; 
+      });
+      
+      colorContainer.appendChild(btn);
+    });
+  }
+
+  // 🌟 修正ポイント2: 独立させたスペック表描画関数をここで呼ぶ
+  renderSpecTable(phone);
 }
 
 const searchBtn = document.getElementById('search-btn');
