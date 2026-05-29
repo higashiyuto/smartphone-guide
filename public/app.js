@@ -7,8 +7,7 @@ const glossaries = {
   'GPU': 'GPUは画像処理を担当するパーツです。特に3Dゲームや動画編集、写真加工の滑らかさに影響します。',
   '容量 (ROM)': 'ROM（ストレージ）は、写真、アプリ、データなどを保存しておく「本棚」です。容量が大きいほど、たくさんのデータを保存できます。',
   'バッテリー': 'バッテリー容量（mAh）が大きいほど、一度の充電で長時間使用できます。',
-  'SDカード': 'SDカードは、写真や動画などのデータを追加で保存するための外部メモリカードです。',
-  'JAC': 'JAC（ジャック）は、イヤホンやヘッドホンを接続するためのポートです。⚪︎は搭載あり、✖︎は非搭載を表します。'
+  'SDカード': 'SDカードは、写真や動画などのデータを追加で保存するための外部メモリカードです。'
 };
 
 async function initApp() {
@@ -22,10 +21,11 @@ function renderTopMenu() {
   const content = document.getElementById('menu-content');
   content.innerHTML = '';
 
-  const appleBtn = createMenuButton('Apple (iPhone等)', 'bg-gray-50 hover:bg-gray-100 border-gray-200');
+  // メニューボタンのデザインを少しリッチに調整
+  const appleBtn = createMenuButton('Apple', 'iPhoneやiPadなど', 'bg-slate-50 hover:bg-slate-100 border-slate-200');
   appleBtn.addEventListener('click', () => renderPhoneList('Apple', 'Appleのスマートフォン', renderTopMenu));
 
-  const androidBtn = createMenuButton('Android (各種ブランド)', 'bg-green-50 hover:bg-green-100 border-green-200 text-green-900');
+  const androidBtn = createMenuButton('Android', '多彩なブランドを展開', 'bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-emerald-900');
   androidBtn.addEventListener('click', renderAndroidBrands);
 
   content.appendChild(appleBtn);
@@ -37,14 +37,14 @@ function renderAndroidBrands() {
   const content = document.getElementById('menu-content');
   content.innerHTML = '';
   const brands = [
-    { name: 'Google (Pixel)', dbName: 'Google' },
-    { name: 'Galaxy (Samsung)', dbName: 'Samsung' },
-    { name: 'AQUOS (SHARP)', dbName: 'SHARP' },
-    { name: 'Xperia (Sony)', dbName: 'Sony' },
-    { name: 'arrows (FCNT)', dbName: 'FCNT' }
+    { name: 'Google', sub: 'Pixelシリーズ', dbName: 'Google' },
+    { name: 'Galaxy', sub: 'Samsung', dbName: 'Samsung' },
+    { name: 'AQUOS', sub: 'SHARP', dbName: 'SHARP' },
+    { name: 'Xperia', sub: 'Sony', dbName: 'Sony' },
+    { name: 'arrows', sub: 'FCNT', dbName: 'FCNT' }
   ];
   brands.forEach(b => {
-    const btn = createMenuButton(b.name, 'border-gray-200 hover:border-blue-400 hover:bg-blue-50');
+    const btn = createMenuButton(b.name, b.sub, 'border-slate-100 hover:border-indigo-300 hover:bg-indigo-50/50 hover:shadow-md');
     btn.addEventListener('click', () => renderPhoneList(b.dbName, `${b.name}のスマートフォン`, renderAndroidBrands));
     content.appendChild(btn);
   });
@@ -56,20 +56,30 @@ function renderPhoneList(targetBrand, titleText, backFunction) {
   content.innerHTML = '';
   const filteredPhones = allSmartphones.filter(phone => phone.brand === targetBrand);
   if (filteredPhones.length === 0) {
-    content.innerHTML = '<p class="text-gray-500 col-span-full py-4 pl-2">現在このブランドの登録データはありません。</p>';
+    content.innerHTML = '<p class="text-slate-400 col-span-full py-6 text-center">現在このブランドの登録データはありません。</p>';
     return;
   }
   filteredPhones.forEach(phone => {
-    const btn = createMenuButton(phone.name, 'border-gray-200 hover:border-blue-400 hover:bg-blue-50 font-bold text-blue-700');
+    // 端末名ボタンを洗練されたスタイルに
+    const btn = createMenuButton(phone.name, '詳細を見る', 'border-slate-100 hover:border-indigo-300 hover:bg-indigo-50/50 hover:shadow-md');
+    // 文字色を上書き
+    btn.querySelector('span.font-bold').className = "font-bold text-indigo-700 text-lg";
     btn.addEventListener('click', () => showDetail(phone));
     content.appendChild(btn);
   });
 }
 
-function createMenuButton(text, extraClasses) {
+// ボタン生成関数をアップグレード（サブタイトルを付けられるように）
+function createMenuButton(title, subtitle, extraClasses) {
   const btn = document.createElement('button');
-  btn.className = `p-4 border rounded-xl text-left transition w-full shadow-sm flex justify-between items-center bg-white ${extraClasses}`;
-  btn.innerHTML = `<span>${text}</span> <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>`;
+  btn.className = `p-5 border rounded-2xl text-left transition-all duration-300 w-full shadow-sm flex justify-between items-center bg-white group ${extraClasses}`;
+  btn.innerHTML = `
+    <div class="flex flex-col">
+      <span class="font-bold text-slate-800">${title}</span>
+      <span class="text-xs text-slate-500 mt-1">${subtitle}</span>
+    </div>
+    <svg class="w-5 h-5 text-slate-300 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+  `;
   return btn;
 }
 
@@ -83,26 +93,28 @@ function showMenuNav(title, backAction) {
   newBackBtn.addEventListener('click', backAction);
 }
 
-// 🌟 辞書表示機能（バグ修正版）
+// 辞書表示のデザインも洗練
 function showGlossary(label, phone) {
   const tbody = document.getElementById('selected-specs');
-  tbody.innerHTML = ''; // 一旦クリア
+  tbody.innerHTML = ''; 
 
   const tr = document.createElement('tr');
   const td = document.createElement('td');
-  td.colSpan = 2; // 🌟 2列分を結合して幅を広げる！
-  td.className = "p-6 bg-white";
+  td.colSpan = 2; 
+  td.className = "p-8 bg-indigo-50/30"; // ほんのり色をつける
 
   td.innerHTML = `
-    <h4 class="font-bold text-lg text-blue-600 mb-2">${label} とは？</h4>
-    <p class="text-gray-700 leading-relaxed mb-4">${glossaries[label] || '説明がありません。'}</p>
+    <div class="flex items-center gap-2 mb-4">
+      <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <h4 class="font-extrabold text-xl text-indigo-900">${label}</h4>
+    </div>
+    <p class="text-slate-600 leading-relaxed mb-6 text-sm md:text-base">${glossaries[label] || '説明がありません。'}</p>
   `;
 
-  // 文字列ではなく、ちゃんとしたボタン要素を作る
   const backBtn = document.createElement('button');
-  backBtn.className = "bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-4 py-2 rounded-lg text-sm transition";
-  backBtn.textContent = "← スペック表に戻る";
-  backBtn.onclick = () => showDetail(phone); // 安全に元のスマホデータを渡す
+  backBtn.className = "flex items-center gap-2 bg-white border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 text-slate-700 font-medium px-5 py-2.5 rounded-xl text-sm transition-all shadow-sm active:scale-95";
+  backBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> スペック表に戻る`;
+  backBtn.onclick = () => showDetail(phone); 
 
   td.appendChild(backBtn);
   tr.appendChild(td);
@@ -115,7 +127,14 @@ function showDetail(phone) {
   dropdownMenu.classList.remove('max-h-[500px]', 'opacity-100');
   
   document.getElementById('welcome-message').classList.add('hidden');
-  document.getElementById('detail-box').classList.remove('hidden');
+  
+  // 一度隠して再度表示することで、簡単なフェードイン効果を出す
+  const detailBox = document.getElementById('detail-box');
+  detailBox.classList.remove('hidden');
+  detailBox.style.animation = 'none';
+  detailBox.offsetHeight; /* trigger reflow */
+  detailBox.style.animation = null;
+
   document.getElementById('selected-name').textContent = phone.name;
 
   const imageEl = document.getElementById('phone-image');
@@ -131,10 +150,16 @@ function showDetail(phone) {
   if (phone.variants) {
     phone.variants.forEach(variant => {
       const btn = document.createElement('button');
-      btn.className = 'w-8 h-8 rounded-full border-2 border-gray-300 shadow-sm hover:scale-110 transition cursor-pointer';
+      // カラーボタンの影やサイズを微調整
+      btn.className = 'w-9 h-9 rounded-full border-2 border-white ring-1 ring-slate-200 shadow-md hover:scale-110 transition-transform cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-400';
       btn.style.backgroundColor = variant.colorHex; 
       btn.addEventListener('click', () => {
-        imageEl.src = variant.imageUrl;
+        // 画像切り替え時にふわっとさせる
+        imageEl.style.opacity = '0.5';
+        setTimeout(() => {
+          imageEl.src = variant.imageUrl;
+          imageEl.style.opacity = '1';
+        }, 150);
         colorNameEl.textContent = variant.colorName; 
       });
       colorContainer.appendChild(btn);
@@ -147,7 +172,7 @@ function showDetail(phone) {
     { label: '発売日', value: phone.releaseDate ? new Date(phone.releaseDate).toLocaleDateString() : '不明' },
     { label: '容量 (ROM)', value: phone.specs?.rom || '不明' },
     { label: 'RAM', value: phone.specs?.ram || '不明' },
-    { label: 'サイズ(高さ×幅×厚さ)', value: phone.size || '不明' },
+    { label: 'サイズ', value: phone.size || '不明' },
     { label: 'ディスプレイ', value: phone.display || '不明' },
     { label: '重量', value: phone.weight || '不明' },
     { label: 'CPU', value: phone.specs?.cpu || '不明' },
@@ -159,25 +184,26 @@ function showDetail(phone) {
 
   specData.forEach(spec => {
     const tr = document.createElement('tr');
-    tr.className = "hover:bg-gray-50 transition";
+    tr.className = "group transition-colors duration-200 hover:bg-indigo-50/40";
     
     const labelCell = document.createElement('th');
-    labelCell.className = "px-4 py-3 bg-gray-100 font-medium text-gray-600 w-1/3";
+    labelCell.className = "px-5 py-4 bg-slate-50/50 font-medium text-slate-500 w-1/3 text-sm";
     
-    // 辞書にある項目ならクリック可能にする
     if (glossaries[spec.label]) {
-      labelCell.classList.add('cursor-pointer', 'hover:text-blue-600', 'underline');
+      labelCell.classList.add('cursor-pointer', 'group-hover:text-indigo-600', 'transition-colors');
+      // 下線ではなく点線で「押せる感」を演出
+      labelCell.innerHTML = `<span class="border-b border-dashed border-slate-300 group-hover:border-indigo-400 pb-0.5">${spec.label}</span>`;
       labelCell.onclick = () => showGlossary(spec.label, phone);
+    } else {
+      labelCell.textContent = spec.label;
     }
-    labelCell.textContent = spec.label;
 
-    // 🌟 修正：テキストにして結合するのをやめ、要素として追加
     const valueCell = document.createElement('td');
-    valueCell.className = "px-4 py-3 text-gray-800";
+    valueCell.className = "px-5 py-4 text-slate-800 font-medium text-sm";
     valueCell.textContent = spec.value;
 
     tr.appendChild(labelCell);
-    tr.appendChild(valueCell); // これでイベントは消えません！
+    tr.appendChild(valueCell);
     tbody.appendChild(tr);
   });
 }
@@ -188,17 +214,17 @@ searchBtn.addEventListener('click', (event) => {
   event.stopPropagation();
   if (dropdownMenu.classList.contains('max-h-0')) {
     dropdownMenu.classList.remove('max-h-0', 'opacity-0');
-    dropdownMenu.classList.add('max-h-[500px]', 'opacity-100');
+    dropdownMenu.classList.add('max-h-[600px]', 'opacity-100'); // 高さを少し拡張
   } else {
     dropdownMenu.classList.add('max-h-0', 'opacity-0');
-    dropdownMenu.classList.remove('max-h-[500px]', 'opacity-100');
+    dropdownMenu.classList.remove('max-h-[600px]', 'opacity-100');
   }
 });
 dropdownMenu.addEventListener('click', (event) => event.stopPropagation());
 window.addEventListener('click', () => {
   if (!dropdownMenu.classList.contains('max-h-0')) {
     dropdownMenu.classList.add('max-h-0', 'opacity-0');
-    dropdownMenu.classList.remove('max-h-[500px]', 'opacity-100');
+    dropdownMenu.classList.remove('max-h-[600px]', 'opacity-100');
   }
 });
 
