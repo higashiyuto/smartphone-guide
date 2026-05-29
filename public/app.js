@@ -117,7 +117,6 @@ function showGlossary(label, phone) {
 
 function showDetail(phone) {
   const dropdownMenu = document.getElementById('dropdown-menu');
-  // 🌟 ここにも pointer-events-none を追加
   dropdownMenu.classList.add('max-h-0', 'opacity-0', 'pointer-events-none');
   dropdownMenu.classList.remove('max-h-[600px]', 'opacity-100');
   
@@ -146,14 +145,14 @@ function showDetail(phone) {
       const btn = document.createElement('button');
       btn.className = 'w-9 h-9 rounded-full border-2 border-white ring-1 ring-slate-200 shadow-md hover:scale-110 transition-transform cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-400';
       btn.style.backgroundColor = variant.colorHex; 
+      
       btn.addEventListener('click', () => {
-        imageEl.style.opacity = '0.5';
-        setTimeout(() => {
-          imageEl.src = variant.imageUrl;
-          imageEl.style.opacity = '1';
-        }, 150);
+        // 🌟 モッサリの原因だった setTimeout と opacity アニメーションを完全削除
+        // 🌟 画像と色名が「タップした瞬間に」サクサク切り替わります！
+        imageEl.src = variant.imageUrl;
         colorNameEl.textContent = variant.colorName; 
       });
+      
       colorContainer.appendChild(btn);
     });
   }
@@ -205,11 +204,9 @@ const dropdownMenu = document.getElementById('dropdown-menu');
 searchBtn.addEventListener('click', (event) => {
   event.stopPropagation();
   if (dropdownMenu.classList.contains('max-h-0')) {
-    // 🌟 表示する時は貫通をオフ（クリック可能にする）
     dropdownMenu.classList.remove('max-h-0', 'opacity-0', 'pointer-events-none');
     dropdownMenu.classList.add('max-h-[600px]', 'opacity-100'); 
   } else {
-    // 🌟 隠す時は貫通をオン
     dropdownMenu.classList.add('max-h-0', 'opacity-0', 'pointer-events-none');
     dropdownMenu.classList.remove('max-h-[600px]', 'opacity-100');
   }
@@ -219,7 +216,6 @@ dropdownMenu.addEventListener('click', (event) => event.stopPropagation());
 
 window.addEventListener('click', () => {
   if (!dropdownMenu.classList.contains('max-h-0')) {
-    // 🌟 ここにも pointer-events-none を追加
     dropdownMenu.classList.add('max-h-0', 'opacity-0', 'pointer-events-none');
     dropdownMenu.classList.remove('max-h-[600px]', 'opacity-100');
   }
