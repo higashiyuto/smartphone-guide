@@ -21,7 +21,6 @@ function renderTopMenu() {
   const content = document.getElementById('menu-content');
   content.innerHTML = '';
 
-  // メニューボタンのデザインを少しリッチに調整
   const appleBtn = createMenuButton('Apple', 'iPhoneやiPadなど', 'bg-slate-50 hover:bg-slate-100 border-slate-200');
   appleBtn.addEventListener('click', () => renderPhoneList('Apple', 'Appleのスマートフォン', renderTopMenu));
 
@@ -60,16 +59,13 @@ function renderPhoneList(targetBrand, titleText, backFunction) {
     return;
   }
   filteredPhones.forEach(phone => {
-    // 端末名ボタンを洗練されたスタイルに
     const btn = createMenuButton(phone.name, '詳細を見る', 'border-slate-100 hover:border-indigo-300 hover:bg-indigo-50/50 hover:shadow-md');
-    // 文字色を上書き
     btn.querySelector('span.font-bold').className = "font-bold text-indigo-700 text-lg";
     btn.addEventListener('click', () => showDetail(phone));
     content.appendChild(btn);
   });
 }
 
-// ボタン生成関数をアップグレード（サブタイトルを付けられるように）
 function createMenuButton(title, subtitle, extraClasses) {
   const btn = document.createElement('button');
   btn.className = `p-5 border rounded-2xl text-left transition-all duration-300 w-full shadow-sm flex justify-between items-center bg-white group ${extraClasses}`;
@@ -93,7 +89,6 @@ function showMenuNav(title, backAction) {
   newBackBtn.addEventListener('click', backAction);
 }
 
-// 辞書表示のデザインも洗練
 function showGlossary(label, phone) {
   const tbody = document.getElementById('selected-specs');
   tbody.innerHTML = ''; 
@@ -101,7 +96,8 @@ function showGlossary(label, phone) {
   const tr = document.createElement('tr');
   const td = document.createElement('td');
   td.colSpan = 2; 
-  td.className = "p-8 bg-indigo-50/30"; // ほんのり色をつける
+  // 🌟 解説欄も少し広く調整
+  td.className = "p-6 md:p-10 bg-indigo-50/30"; 
 
   td.innerHTML = `
     <div class="flex items-center gap-2 mb-4">
@@ -128,11 +124,10 @@ function showDetail(phone) {
   
   document.getElementById('welcome-message').classList.add('hidden');
   
-  // 一度隠して再度表示することで、簡単なフェードイン効果を出す
   const detailBox = document.getElementById('detail-box');
   detailBox.classList.remove('hidden');
   detailBox.style.animation = 'none';
-  detailBox.offsetHeight; /* trigger reflow */
+  detailBox.offsetHeight;
   detailBox.style.animation = null;
 
   document.getElementById('selected-name').textContent = phone.name;
@@ -150,11 +145,9 @@ function showDetail(phone) {
   if (phone.variants) {
     phone.variants.forEach(variant => {
       const btn = document.createElement('button');
-      // カラーボタンの影やサイズを微調整
       btn.className = 'w-9 h-9 rounded-full border-2 border-white ring-1 ring-slate-200 shadow-md hover:scale-110 transition-transform cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-400';
       btn.style.backgroundColor = variant.colorHex; 
       btn.addEventListener('click', () => {
-        // 画像切り替え時にふわっとさせる
         imageEl.style.opacity = '0.5';
         setTimeout(() => {
           imageEl.src = variant.imageUrl;
@@ -187,11 +180,11 @@ function showDetail(phone) {
     tr.className = "group transition-colors duration-200 hover:bg-indigo-50/40";
     
     const labelCell = document.createElement('th');
-    labelCell.className = "px-5 py-4 bg-slate-50/50 font-medium text-slate-500 w-1/3 text-sm";
+    // 🌟 paddingを py-4 から py-5 (PCは py-6) に広げて高さを確保
+    labelCell.className = "px-5 py-5 md:py-6 bg-slate-50/50 font-medium text-slate-500 w-1/3 text-sm";
     
     if (glossaries[spec.label]) {
       labelCell.classList.add('cursor-pointer', 'group-hover:text-indigo-600', 'transition-colors');
-      // 下線ではなく点線で「押せる感」を演出
       labelCell.innerHTML = `<span class="border-b border-dashed border-slate-300 group-hover:border-indigo-400 pb-0.5">${spec.label}</span>`;
       labelCell.onclick = () => showGlossary(spec.label, phone);
     } else {
@@ -199,7 +192,8 @@ function showDetail(phone) {
     }
 
     const valueCell = document.createElement('td');
-    valueCell.className = "px-5 py-4 text-slate-800 font-medium text-sm";
+    // 🌟 こちらも py-5 (PCは py-6) に変更
+    valueCell.className = "px-5 py-5 md:py-6 text-slate-800 font-medium text-sm";
     valueCell.textContent = spec.value;
 
     tr.appendChild(labelCell);
@@ -214,7 +208,7 @@ searchBtn.addEventListener('click', (event) => {
   event.stopPropagation();
   if (dropdownMenu.classList.contains('max-h-0')) {
     dropdownMenu.classList.remove('max-h-0', 'opacity-0');
-    dropdownMenu.classList.add('max-h-[600px]', 'opacity-100'); // 高さを少し拡張
+    dropdownMenu.classList.add('max-h-[600px]', 'opacity-100'); 
   } else {
     dropdownMenu.classList.add('max-h-0', 'opacity-0');
     dropdownMenu.classList.remove('max-h-[600px]', 'opacity-100');
