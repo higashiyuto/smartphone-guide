@@ -232,9 +232,9 @@ mongoose.connect(process.env.MONGO_URI)
           rom: "128GB"
         },
         variants: [
-          { colorName: "オーサムネイビー", colorHex: "#4A5D82", imageUrl: "/images/galaxy-a57-navy.png" },
-          { colorName: "オーサムグレー", colorHex: "#2b2b2b", imageUrl: "/images/galaxy-a57-gray.png" },
-          { colorName: "オーサムライラック", colorHex: "#E6EBEF", imageUrl: "/images/galaxy-a57-lavender.png" }
+          { colorName: "オーサムネイビー", colorHex: "#2B3342", imageUrl: "/images/galaxy-a57-navy.png" },
+          { colorName: "オーサムグレー", colorHex: "#686C73", imageUrl: "/images/galaxy-a57-gray.png" },
+          { colorName: "オーサムライラック", colorHex: "#D1C4D9", imageUrl: "/images/galaxy-a57-lavender.png" }
         ]
       },
       {
