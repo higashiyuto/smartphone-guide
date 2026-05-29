@@ -1,5 +1,14 @@
 let allSmartphones = []; // 取得した全スマホデータを保持しておく変数
 
+const glossaries = {
+  'RAM': 'RAM（Random Access Memory）は、スマホがアプリを動かすための「作業机」です。容量が大きいほど、多くのアプリを同時に開いても動作が重くなりにくくなります。',
+  'CPU': 'CPUはスマホの「頭脳」です。計算処理の速度を決定し、アプリの起動やゲームの快適さに大きく関わります。',
+  'GPU': 'GPUは画像処理を担当するパーツです。特に3Dゲームや動画編集、写真加工の滑らかさに影響します。',
+  'ROM': 'ROM（ストレージ）は、写真、アプリ、データなどを保存しておく「本棚」です。容量が大きいほど、たくさんのデータを保存できます。',
+  'バッテリー': 'バッテリー容量（mAh）が大きいほど、一度の充電で長時間使用できます。',
+  'JAC': 'JACはイヤホンジャックの有無です。有線イヤホンを直接接続できるかを指します。'
+};
+
 // アプリの初期化
 async function initApp() {
   const response = await fetch('/api/smartphones');
@@ -147,11 +156,20 @@ function showDetail(phone) {
 
     specData.forEach(spec => {
       const tr = document.createElement('tr');
-      tr.className = "hover:bg-gray-50 transition"; // 行にマウスを乗せると少し色が変わる
-      tr.innerHTML = `
-        <th class="px-4 py-3 bg-gray-100 font-medium text-gray-600 w-1/3">${spec.label}</th>
-        <td class="px-4 py-3 text-gray-800">${spec.value}</td>
-      `;
+      tr.className = "hover:bg-gray-50 transition";
+      
+      // 🌟 ラベル部分にクリックイベントを追加
+      const labelCell = document.createElement('th');
+      labelCell.className = "px-4 py-3 bg-gray-100 font-medium text-gray-600 w-1/3 cursor-pointer hover:text-blue-600";
+      labelCell.textContent = spec.label;
+      
+      // 解説があればクリック可能にする
+      if (glossaries[spec.label]) {
+        labelCell.onclick = () => showGlossary(spec.label, spec.value, phone);
+      }
+
+      tr.appendChild(labelCell);
+      tr.innerHTML += `<td class="px-4 py-3 text-gray-800">${spec.value}</td>`;
       tbody.appendChild(tr);
     });
   }
@@ -188,6 +206,22 @@ window.addEventListener('click', () => {
     dropdownMenu.classList.remove('max-h-[500px]', 'opacity-100');
   }
 });
+
+function showGlossary(label, value, phone) {
+  const tbody = document.getElementById('selected-specs');
+  tbody.innerHTML = `
+    <tr>
+      <td class="p-6">
+        <h4 class="font-bold text-lg text-blue-600 mb-2">${label} とは？</h4>
+        <p class="text-gray-700 leading-relaxed mb-4">${glossaries[label]}</p>
+        <button onclick="showDetail(allSmartphones.find(p => p.name === '${phone.name}'))" 
+                class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg text-sm transition">
+          ← スペック表に戻る
+        </button>
+      </td>
+    </tr>
+  `;
+}
 
 // アプリ起動
 initApp();
