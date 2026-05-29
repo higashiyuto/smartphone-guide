@@ -216,6 +216,28 @@ mongoose.connect(process.env.MONGO_URI)
         ]
       },
       {
+        name: "Galaxy A57",
+        brand: "Samsung",
+        releaseDate: "2026-03-12",
+        size: "162mm x 77mm x 6.9mm",
+        display: "6.7インチ",
+        weight: "約179g",
+        battery: "5000mAh",
+        sd_card: "-",
+        jac: "-",
+        specs: {
+          cpu: "Exynos 1680",
+          gpu: "",
+          ram: "8GB",
+          rom: "128GB"
+        },
+        variants: [
+          { colorName: "オーサムネイビー", colorHex: "#4A5D82", imageUrl: "/images/galaxy-a57-navy.png" },
+          { colorName: "オーサムグレー", colorHex: "#2b2b2b", imageUrl: "/images/galaxy-a57-gray.png" },
+          { colorName: "オーサムライラック", colorHex: "#E6EBEF", imageUrl: "/images/galaxy-a57-lavender.png" }
+        ]
+      },
+      {
         name: "Galaxy A25",
         brand: "Samsung",
         releaseDate: "2025-02-07",
