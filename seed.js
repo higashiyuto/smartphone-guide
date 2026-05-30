@@ -32,6 +32,7 @@ mongoose.connect(process.env.MONGO_URI)
         variants: [
           { colorName: "ブルー", colorHex: "#B4C5D6", imageUrl: "/images/iphone17-blue.png" },
           { colorName: "セージ", colorHex: "#A1B5A8", imageUrl: "/images/iphone17-sage.png" },
+          { colorName: "ラベンダー", colorHex: "", imageUrl: "/images/iphone17-lavender.png" },
           { colorName: "ホワイト", colorHex: "#FBFBFD", imageUrl: "/images/iphone17-white.png" },
           { colorName: "ブラック", colorHex: "#2F3033", imageUrl: "/images/iphone17-black.png" }
         ]
@@ -142,7 +143,7 @@ mongoose.connect(process.env.MONGO_URI)
           rom: "128GB / 256GB"
         },
         variants: [
-          { colorName: "ラベンダー", colorHex: "#D8CCED", imageUrl: "/images/pixel10a-lavender.png" },
+          { colorName: "ラベンダー", colorHex: "#A7C5D3", imageUrl: "/images/pixel10a-lavender.png" },
           { colorName: "オブシディアン", colorHex: "#202124", imageUrl: "/images/pixel10a-black.png" },
           { colorName: "フォグ", colorHex: "#E1E3E1", imageUrl: "/images/pixel10a-fog.png" },
           { colorName: "イサイブルー", colorHex: "#3B70E5", imageUrl: "/images/pixel10a-blue.png" },
@@ -254,7 +255,7 @@ mongoose.connect(process.env.MONGO_URI)
           rom: "64GB"
         },
         variants: [
-          { colorName: "ライトブルー", colorHex: "#B1D8F5", imageUrl: "/images/galaxy-a25-blue.png" },
+          { colorName: "ライトブルー", colorHex: "#A7C5D3", imageUrl: "/images/galaxy-a25-blue.png" },
           { colorName: "ブラック", colorHex: "#2b2b2b", imageUrl: "/images/galaxy-a25-black.png" }
         ]
       },
