@@ -32,7 +32,7 @@ mongoose.connect(process.env.MONGO_URI)
         variants: [
           { colorName: "ブルー", colorHex: "#B4C5D6", imageUrl: "/images/iphone17-blue.png" },
           { colorName: "セージ", colorHex: "#A1B5A8", imageUrl: "/images/iphone17-sage.png" },
-          { colorName: "ラベンダー", colorHex: "", imageUrl: "/images/iphone17-lavender.png" },
+          { colorName: "ラベンダー", colorHex: "#D8CCED", imageUrl: "/images/iphone17-lavender.png" },
           { colorName: "ホワイト", colorHex: "#FBFBFD", imageUrl: "/images/iphone17-white.png" },
           { colorName: "ブラック", colorHex: "#2F3033", imageUrl: "/images/iphone17-black.png" }
         ]
