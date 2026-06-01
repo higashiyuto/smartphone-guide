@@ -1,4 +1,5 @@
 let allSmartphones = [];
+let currentSelectionTarget = 'main'; // 'main', 'left', 'right' のいずれか
 
 const glossaries = {
   'RAM': 'RAM（Random Access Memory）は、スマホがアプリを動かすための「作業机」です。容量が大きいほど、多くのアプリを同時に開いても動作が重くなりにくくなります。',
@@ -89,40 +90,98 @@ function showMenuNav(title, backAction) {
   newBackBtn.addEventListener('click', backAction);
 }
 
-function showGlossary(label, phone) {
-  const tbody = document.getElementById('selected-specs');
+// targetElementId を受け取って、戻るボタンが正しい表を再描画できるようにする
+function showGlossary(label, phone, targetElementId) {
+  const tbody = document.getElementById(targetElementId);
   tbody.innerHTML = ''; 
 
   const tr = document.createElement('tr');
   const td = document.createElement('td');
   td.colSpan = 2; 
-  td.className = "p-6 md:p-10 bg-indigo-50/30"; 
+  td.className = "p-4 md:p-8 bg-indigo-50/30"; 
 
   td.innerHTML = `
-    <div class="flex items-center gap-2 mb-4">
-      <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-      <h4 class="font-extrabold text-xl text-indigo-900">${label}</h4>
+    <div class="flex items-center gap-2 mb-3">
+      <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <h4 class="font-extrabold text-lg text-indigo-900">${label}</h4>
     </div>
-    <p class="text-slate-600 leading-relaxed mb-6 text-sm md:text-base">${glossaries[label] || '説明がありません。'}</p>
+    <p class="text-slate-600 leading-relaxed mb-5 text-sm">${glossaries[label] || '説明がありません。'}</p>
   `;
 
   const backBtn = document.createElement('button');
-  backBtn.className = "flex items-center gap-2 bg-white border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 text-slate-700 font-medium px-5 py-2.5 rounded-xl text-sm transition-all shadow-sm active:scale-95";
+  backBtn.className = "flex items-center gap-2 bg-white border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 text-slate-700 font-medium px-4 py-2 rounded-xl text-sm transition-all shadow-sm active:scale-95";
   backBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> スペック表に戻る`;
   
-  // 🌟 修正ポイント1: showDetail ではなく、新しい renderSpecTable を呼ぶ！
-  backBtn.onclick = () => renderSpecTable(phone); 
+  // 該当する表（メイン、左、右）に再描画する
+  backBtn.onclick = () => renderSpecTable(phone, targetElementId); 
 
   td.appendChild(backBtn);
   tr.appendChild(td);
   tbody.appendChild(tr);
 }
 
-// 🌟 新しく作成した関数：スペック表だけを描画・再描画する処理
-function renderSpecTable(phone) {
-  const tbody = document.getElementById('selected-specs');
+function showDetail(phone) {
+  // メニューを閉じる
+  dropdownMenu.classList.add('max-h-0', 'opacity-0', 'pointer-events-none');
+  dropdownMenu.classList.remove('max-h-[600px]', 'opacity-100');
+  document.getElementById('welcome-message').classList.add('hidden');
+
+  // メイン画面への反映
+  if (currentSelectionTarget === 'main') {
+    document.getElementById('compare-container').classList.add('hidden');
+    document.getElementById('portrait-warning').classList.add('hidden');
+    
+    const detailBox = document.getElementById('detail-box');
+    detailBox.classList.remove('hidden');
+    document.getElementById('selected-name').textContent = phone.name;
+    
+    const imageEl = document.getElementById('phone-image');
+    const colorNameEl = document.getElementById('current-color-name');
+    
+    if (phone.variants && phone.variants.length > 0) {
+      imageEl.src = phone.variants[0].imageUrl;
+      colorNameEl.textContent = phone.variants[0].colorName;
+    }
+
+    // カラーオプションの生成（メイン画面専用）
+    const colorContainer = document.getElementById('color-options');
+    colorContainer.innerHTML = ''; 
+    if (phone.variants) {
+      phone.variants.forEach(variant => {
+        const btn = document.createElement('button');
+        btn.className = 'w-9 h-9 rounded-full border-2 border-white ring-1 ring-slate-200 shadow-md hover:scale-110 transition-transform cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-400';
+        btn.style.backgroundColor = variant.colorHex; 
+        
+        btn.addEventListener('click', () => {
+          imageEl.src = variant.imageUrl;
+          colorNameEl.textContent = variant.colorName; 
+        });
+        
+        colorContainer.appendChild(btn);
+      });
+    }
+    
+    renderSpecTable(phone, 'selected-specs'); 
+    
+  } else {
+    // 比較モード（左 or 右）への反映
+    const prefix = currentSelectionTarget; // 'left' or 'right'
+    document.getElementById(`compare-name-${prefix}`).textContent = phone.name;
+    
+    if (phone.variants && phone.variants.length > 0) {
+      document.getElementById(`compare-image-${prefix}`).src = phone.variants[0].imageUrl;
+    }
+    
+    renderSpecTable(phone, `compare-specs-${prefix}`); 
+  }
+}
+
+// ターゲットとなるtbodyのIDを受け取って描画する
+function renderSpecTable(phone, targetElementId) {
+  const tbody = document.getElementById(targetElementId);
   tbody.innerHTML = '';
   
+  // スマホのスペックデータ定義（ここで復活させました）
   const specData = [
     { label: '発売日', value: phone.releaseDate ? new Date(phone.releaseDate).toLocaleDateString() : '不明' },
     { label: '容量 (ROM)', value: phone.specs?.rom || '不明' },
@@ -142,18 +201,19 @@ function renderSpecTable(phone) {
     tr.className = "group transition-colors duration-200 hover:bg-indigo-50/40";
     
     const labelCell = document.createElement('th');
-    labelCell.className = "px-5 py-5 md:py-6 bg-slate-50/50 font-medium text-slate-500 w-1/3 text-sm";
+    labelCell.className = "px-3 py-3 bg-slate-50/50 font-medium text-slate-500 w-1/3 text-xs"; 
     
+    // 用語解説がある場合の処理（ここで復活させました）
     if (glossaries[spec.label]) {
       labelCell.classList.add('cursor-pointer', 'group-hover:text-indigo-600', 'transition-colors');
       labelCell.innerHTML = `<span class="border-b border-dashed border-slate-300 group-hover:border-indigo-400 pb-0.5">${spec.label}</span>`;
-      labelCell.onclick = () => showGlossary(spec.label, phone);
+      labelCell.onclick = () => showGlossary(spec.label, phone, targetElementId);
     } else {
       labelCell.textContent = spec.label;
     }
 
     const valueCell = document.createElement('td');
-    valueCell.className = "px-5 py-5 md:py-6 text-slate-800 font-medium text-sm";
+    valueCell.className = "px-3 py-3 text-slate-800 font-medium text-xs";
     valueCell.textContent = spec.value;
 
     tr.appendChild(labelCell);
@@ -162,79 +222,39 @@ function renderSpecTable(phone) {
   });
 }
 
-function showDetail(phone) {
-  const dropdownMenu = document.getElementById('dropdown-menu');
-  dropdownMenu.classList.add('max-h-0', 'opacity-0', 'pointer-events-none');
-  dropdownMenu.classList.remove('max-h-[600px]', 'opacity-100');
-  
-  document.getElementById('welcome-message').classList.add('hidden');
-  
-  const detailBox = document.getElementById('detail-box');
-  detailBox.classList.remove('hidden');
-  detailBox.style.animation = 'none';
-  detailBox.offsetHeight;
-  detailBox.style.animation = null;
-
-  document.getElementById('selected-name').textContent = phone.name;
-
-  const imageEl = document.getElementById('phone-image');
-  const colorNameEl = document.getElementById('current-color-name');
-  
-  // 色や画像の初期化はここでのみ行う
-  if (phone.variants && phone.variants.length > 0) {
-    imageEl.src = phone.variants[0].imageUrl;
-    colorNameEl.textContent = phone.variants[0].colorName;
-  }
-
-  const colorContainer = document.getElementById('color-options');
-  colorContainer.innerHTML = ''; 
-  if (phone.variants) {
-    phone.variants.forEach(variant => {
-      const btn = document.createElement('button');
-      btn.className = 'w-9 h-9 rounded-full border-2 border-white ring-1 ring-slate-200 shadow-md hover:scale-110 transition-transform cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-400';
-      btn.style.backgroundColor = variant.colorHex; 
-      
-      btn.addEventListener('click', () => {
-        imageEl.src = variant.imageUrl;
-        colorNameEl.textContent = variant.colorName; 
-      });
-      
-      colorContainer.appendChild(btn);
-    });
-  }
-  renderSpecTable(phone);
-}
-
+// 各種ボタンのイベントリスナー設定
 const searchBtn = document.getElementById('search-btn');
+const compareBtn = document.getElementById('compare-btn');
 const dropdownMenu = document.getElementById('dropdown-menu');
 
-searchBtn.addEventListener('click', (event) => {
-  event.stopPropagation();
-  if (dropdownMenu.classList.contains('max-h-0')) {
-    dropdownMenu.classList.remove('max-h-0', 'opacity-0', 'pointer-events-none');
-    dropdownMenu.classList.add('max-h-[600px]', 'opacity-100'); 
-  } else {
-    dropdownMenu.classList.add('max-h-0', 'opacity-0', 'pointer-events-none');
-    dropdownMenu.classList.remove('max-h-[600px]', 'opacity-100');
-  }
+function openDropdown(target) {
+  currentSelectionTarget = target; 
+  dropdownMenu.classList.remove('max-h-0', 'opacity-0', 'pointer-events-none');
+  dropdownMenu.classList.add('max-h-[600px]', 'opacity-100');
+}
+
+searchBtn.addEventListener('click', (e) => { e.stopPropagation(); openDropdown('main'); });
+document.getElementById('search-left-btn').addEventListener('click', (e) => { e.stopPropagation(); openDropdown('left'); });
+document.getElementById('search-right-btn').addEventListener('click', (e) => { e.stopPropagation(); openDropdown('right'); });
+
+compareBtn.addEventListener('click', () => {
+  document.getElementById('welcome-message').classList.add('hidden');
+  document.getElementById('detail-box').classList.add('hidden');
+  document.getElementById('compare-container').classList.remove('hidden');
+  document.getElementById('portrait-warning').classList.remove('hidden'); 
 });
 
-dropdownMenu.addEventListener('click', (event) => event.stopPropagation());
+document.getElementById('close-compare-btn').addEventListener('click', () => {
+  document.getElementById('compare-container').classList.add('hidden');
+  document.getElementById('portrait-warning').classList.add('hidden');
+  document.getElementById('welcome-message').classList.remove('hidden'); 
+});
 
-window.addEventListener('click', () => {
-  if (!dropdownMenu.classList.contains('max-h-0')) {
-    dropdownMenu.classList.add('max-h-0', 'opacity-0', 'pointer-events-none');
-    dropdownMenu.classList.remove('max-h-[600px]', 'opacity-100');
+// バックグラウンドからの復帰時にリロードする処理
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    window.location.reload();
   }
 });
 
 initApp();
-
-// アプリ（タブ）の表示状態が変わったことを検知するイベントリスナー
-document.addEventListener('visibilitychange', () => {
-  // アプリが再び画面に表示された（フォアグラウンドに戻った）場合
-  if (document.visibilityState === 'visible') {
-    // ページを強制的にリロードする
-    window.location.reload();
-  }
-});
