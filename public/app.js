@@ -237,11 +237,20 @@ searchBtn.addEventListener('click', (e) => { e.stopPropagation(); openDropdown('
 document.getElementById('search-left-btn').addEventListener('click', (e) => { e.stopPropagation(); openDropdown('left'); });
 document.getElementById('search-right-btn').addEventListener('click', (e) => { e.stopPropagation(); openDropdown('right'); });
 
-compareBtn.addEventListener('click', () => {
+compareBtn.addEventListener('click', (e) => {
+  e.stopPropagation(); // イベントの伝播を止める
+  
+  // UIを比較モードに切り替え
   document.getElementById('welcome-message').classList.add('hidden');
   document.getElementById('detail-box').classList.add('hidden');
   document.getElementById('compare-container').classList.remove('hidden');
   document.getElementById('portrait-warning').classList.remove('hidden'); 
+  
+  // 左パネルが「未選択」の場合のみ、自動で左用の検索ドロップダウンを開く
+  const leftName = document.getElementById('compare-name-left').textContent;
+  if (leftName === '未選択') {
+    openDropdown('left');
+  }
 });
 
 document.getElementById('close-compare-btn').addEventListener('click', () => {
