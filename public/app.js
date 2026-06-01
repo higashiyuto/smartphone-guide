@@ -202,8 +202,6 @@ function showDetail(phone) {
       colorContainer.appendChild(btn);
     });
   }
-
-  // 🌟 修正ポイント2: 独立させたスペック表描画関数をここで呼ぶ
   renderSpecTable(phone);
 }
 
@@ -231,3 +229,12 @@ window.addEventListener('click', () => {
 });
 
 initApp();
+
+// アプリ（タブ）の表示状態が変わったことを検知するイベントリスナー
+document.addEventListener('visibilitychange', () => {
+  // アプリが再び画面に表示された（フォアグラウンドに戻った）場合
+  if (document.visibilityState === 'visible') {
+    // ページを強制的にリロードする
+    window.location.reload();
+  }
+});

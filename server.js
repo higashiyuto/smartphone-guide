@@ -20,7 +20,6 @@ mongoose.connect(MONGO_URI)
   .then(() => console.log('MongoDBに正常に接続されました。'))
   .catch(err => console.error('MongoDB接続エラー:', err));
 
-
 // 全てのスマホ一覧を取得するAPI
 app.get('/api/smartphones', async (req, res) => {
   try {
